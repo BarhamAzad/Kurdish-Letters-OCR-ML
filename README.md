@@ -2,25 +2,6 @@
 
 A PyTorch-based Convolutional Neural Network for classifying the entire Kurdish handwritten alphabet  using deep learning and advanced techniques.
 
-
-
-## 📋 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Architecture](#architecture)
-- [Dataset](#dataset)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Training Process](#training-process)
-- [Model Performance](#model-performance)
-- [Results](#results)
-- [Usage Examples](#usage-examples)
-- [Technical Details](#technical-details)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-- [Citation](#citation)
-
 ## Overview
 
 This project trains and deploys an advanced CNN model to recognize and classify the full Kurdish alphabet with **exceptional performance**:
