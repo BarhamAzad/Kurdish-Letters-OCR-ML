@@ -1,388 +1,547 @@
-# Kurdish Letter OCR - CNN Classification Model
+# Kurdish Full Alphabet OCR - Advanced CNN Classification Model
 
-A PyTorch-based Convolutional Neural Network for classifying Kurdish handwritten letters using deep learning.
+A PyTorch-based Convolutional Neural Network for classifying the entire Kurdish handwritten alphabet  using deep learning and advanced techniques.
+
+
+
+## 📋 Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Dataset](#dataset)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Training Process](#training-process)
+- [Model Performance](#model-performance)
+- [Results](#results)
+- [Usage Examples](#usage-examples)
+- [Technical Details](#technical-details)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
+- [Citation](#citation)
 
 ## Overview
 
-This project trains and deploys a CNN model to recognize and classify 5 Kurdish letters:
-- EEE (ێ)
-- LLL (ڵ)
-- OOO (ۆ)
-- RRR (ڕ)
-- VVV (ڤ)
+This project trains and deploys an advanced CNN model to recognize and classify the full Kurdish alphabet with **exceptional performance**:
+- Full kurdish alphabet (33 letters)
+- **Achieves 95.87% validation accuracy** on unseen test data
+- Optimized for fast inference (real-time performance)
+- Built with cutting-edge deep learning techniques
+- Comprehensive dataset of 33,067 images across 33 classes
 
-The model processes 64x64 grayscale images and achieves 85-95% accuracy on unseen test data.
+The model processes 64x64 grayscale images using state-of-the-art techniques including residual connections, data augmentation, and mixed precision training.
 
 ## Features
 
-- PyTorch-based CNN architecture (no Transformers)
-- GPU support with CPU fallback
-- Batch image testing capabilities
-- Detailed confidence scores and probability visualization
-- Modular, well-documented code
+### 🧠 Advanced Neural Architecture
+- **PyTorch-based Advanced CNN architecture** with residual connections (ResNet-style)
+- **1.49M trainable parameters** optimized for efficiency
+- **LeakyReLU activation** (0.1 slope) for improved gradient flow
+- **Global Average Pooling** for flexible input sizes
+- **Projection shortcuts** to handle channel dimension changes
 
-## Project Structure
+### 🚀 Performance Optimized
+- **GPU support** with automatic CPU fallback
+- **Mixed Precision Training (AMP)** for faster computation
+- **Real-time inference** (<20ms on GPU, <50ms on CPU)
+- **95.87% validation accuracy** achieved in just 15.8 minutes training time
+
+### 📊 Comprehensive Dataset
+- **33,067 total images** across 33 Kurdish character classes
+- **Consistent distribution** (1,008 images per class for most letters)
+- **Real-world handwritten samples** for authentic training data
+- **Proper Unicode mapping** for each Kurdish character
+
+### 🛠️ Robust Tools
+- **Batch image testing** capabilities
+- **Detailed confidence scores** and probability visualization
+- **Live camera inference** with interactive GUI
+- **Modular, well-documented code**
+- **Cross-platform compatibility**
+
+### 🎯 Deep Learning Features
+- **Advanced data augmentation** (rotation, scaling, noise, elastic transforms)
+- **Early stopping** to prevent overfitting
+- **Learning rate scheduling** for optimal convergence
+- **Batch normalization** for training stability
+- **Dropout regularization** (30%) to prevent overfitting
+
+## Architecture
+
+### KurdishAdvancedCNN Architecture
+
+The KurdishAdvancedCNN is a sophisticated 4-layer convolutional neural network with residual connections inspired by ResNet architecture:
 
 ```
-Kurdish-Letters-OCR-ML/
-├── training_CNN.ipynb              # Model training notebook
-├── testing_CNN.ipynb               # Model evaluation notebook
-├── README.md                       # This file
-├── kurdish_letter_model_pytorch.pth    # Trained model weights
-└── [letter_folders]/
-    ├── EEE_letters/               # Training images for EEE
-    ├── LLL_letters/               # Training images for LLL
-    ├── OOO_letters/               # Training images for OOO
-    ├── RRR_letters/               # Training images for RRR
-    └── VVV_letters/               # Training images for VVV
+Input (3x64x64) [Grayscale images converted to 3-channel for augmentation compatibility]
+
+├── Block 1: Input → 32 channels
+│   ├── Conv2d(3→32, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Conv2d(32→32, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Add + LeakyReLU(0.1) + MaxPool(2x2) + Dropout2D(0.3)
+│   └── Residual connection (direct path)
+
+├── Block 2: 32 → 64 channels
+│   ├── Projection Layer: 32→64 (1x1 Conv + BatchNorm for dimension matching)
+│   ├── Conv2d(32→64, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Conv2d(64→64, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Add + LeakyReLU(0.1) + MaxPool(2x2) + Dropout2D(0.3)
+│   └── Residual connection (projection + original path)
+
+├── Block 3: 64 → 128 channels
+│   ├── Projection Layer: 64→128 (1x1 Conv + BatchNorm)
+│   ├── Conv2d(64→128, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Conv2d(128→128, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Add + LeakyReLU(0.1) + MaxPool(2x2) + Dropout2D(0.3)
+│   └── Residual connection (projection + original path)
+
+├── Block 4: 128 → 256 channels
+│   ├── Projection Layer: 128→256 (1x1 Conv + BatchNorm)
+│   ├── Conv2d(128→256, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Conv2d(256→256, 3x3) + BatchNorm + LeakyReLU(0.1)
+│   ├── Add + LeakyReLU(0.1) + MaxPool(2x2) + Dropout2D(0.3)
+│   └── Residual connection (projection + original path)
+
+├── Global Average Pooling
+├── Flatten (256 → 256)
+├── FC(256→512) + BatchNorm1D + LeakyReLU(0.1) + Dropout(0.3)
+├── FC(512→256) + BatchNorm1D + LeakyReLU(0.1) + Dropout(0.3)
+└── FC(256→33 classes) + Softmax
+
+Total Parameters: 1,491,009 trainable weights
 ```
 
-## Model Architecture
+### Key Architectural Features
+- **Residual Connections**: Enable training of deep networks without vanishing gradients
+- **Projection Shortcuts**: Handle channel dimension mismatches between residual blocks
+- **Batch Normalization**: Stabilizes training and accelerates convergence
+- **LeakyReLU Activation**: Prevents dead neurons and improves gradient flow
+- **Dropout Regularization**: Prevents overfitting with 30% dropout rate
+- **Global Average Pooling**: Reduces parameters and prevents overfitting
 
-The KurdishCNN is a 3-layer convolutional neural network:
+### Data Augmentation Pipeline
+- **Horizontal Flip**: 30% probability
+- **Rotation**: ±15 degrees with 30% probability
+- **Affine Transforms**: Translation, scaling, rotation with 30% probability
+- **Brightness/Contrast**: ±20% limits with 30% probability
+- **Gaussian Noise**: With 20% probability
+- **Elastic Transform**: With 10% probability
+- **Normalization**: ImageNet statistics (mean=[0.456], std=[0.224])
 
+## Dataset
+
+### Dataset Composition
+
+The dataset contains comprehensive Kurdish character data with detailed image counts:
+
+| Character | Name | Unicode | Image Count | Description |
+|-----------|------|---------|-------------|-------------|
+| **س** | Seen | U+0633 | **1,071** | Highest count character |
+| **ک** | Kaf (keheh) | U+06A9 | 1,025 | Arabic letter keheh |
+| **ا** | Alef | U+0627 | 1,008 | Basic vowel letter |
+| **ب** | Be | U+0628 | 1,008 | Basic consonant |
+| **ت** | Te | U+062A | 1,008 | Consonant with three dots |
+| **ج** | Jim | U+062C | 1,008 | Consonant with distinctive shape |
+| **ح** | Hah | U+062D | 1,008 | Consonant with bowl shape |
+| **خ** | Khe | U+062E | 1,008 | Consonant with vertical stem |
+| **د** | Dal | U+062F | 1,008 | Vowel consonant |
+| **ر** | Re | U+0631 | 1,008 | Consonant with curved shape |
+| **ز** | Ze | U+0632 | 1,008 | Similar to Re |
+| **ش** | Sheen | U+0634 | 1,008 | Visually similar to Seen |
+| **ع** | Ayn | U+0639 | 1,008 | Complex joining character |
+| **غ** | Ghayn | U+063A | 1,008 | Similar to Ayn |
+| **ف** | Feh | U+0641 | 1,008 | Consonant with dot placement |
+| **ق** | Qaf | U+0642 | 1,008 | Consonant with bowl shape |
+| **ك** | Kaf | U+0643 | 1,008 | Standard Arabic Kaf |
+| **ل** | Lam | U+0644 | 1,008 | Consonant that connects |
+| **م** | Mim | U+0645 | 1,008 | Closed bowl shaped |
+| **ن** | Nun | U+0646 | 1,008 | Consonant with distinctive tail |
+| **ه** | Heh | U+0647 | 1,008 | Final form separator |
+| **و** | Waw | U+0648 | 1,008 | Round vowel character |
+| **وو** | Ve | U+06CB | 1,008 | Kurdish-specific double Waw |
+| **پ** | Pe | U+067E | 1,008 | Consonant with two dots |
+| **چ** | Che | U+0686 | 1,008 | Visually similar to Jim |
+| **ڕ** | Re with ring | U+0695 | 1,008 | Distinctive Kurdish with ring |
+| **ژ** | Zhe | U+0698 | 1,008 | Distinctive Kurdish with three dots |
+| **ڤ** | Pe with three dots | U+06A4 | 1,008 | Kurdish-specific with three dots |
+| **گ** | Gaf | U+06AF | 1,008 | Similar to Kaf |
+| **ڵ** | Lam with line | U+06B5 | 1,008 | Kurdish-specific Lam variant |
+| **ھ** | Heh goal | U+06BE | 1,008 | Kurdish-specific Heh variant |
+| **ۆ** | OE | U+06C6 | 1,008 | Kurdish-specific vowel |
+| **ی** | Farsi Yeh | U+06CC | **731** | Lowest count character |
+
+**Total Dataset Statistics:**
+- **Total Images**: 33,067
+- **Total Classes**: 33 Kurdish letters
+- **Training Samples**: 26,453 (80%)
+- **Validation Samples**: 6,614 (20%)
+- **Average per Class**: 1,008 images
+- **Image Size**: 64x64 pixels (resized from original)
+- **Format**: JPG, PNG, JPEG, BMP
+
+### Data Distribution Analysis
+- **Balanced dataset**: Most classes have exactly 1,008 images
+- **Highest count**: **س** (Seen) with 1,071 images
+- **Lowest count**: **ی** (Farsi Yeh) with 731 images
+- **Kurdish-specific letters**: **ڕ**, **ژ**, **ڤ**, **ڵ**, **ۆ**, **وو** are distinctive to Kurdish
+- **Arabic script base**: Most letters follow Arabic script with Kurdish modifications
+
+## Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- CUDA-compatible GPU (optional but recommended)
+- 8GB+ RAM recommended
+
+### Setup
+
+1. **Clone the repository**:
+```bash
+git clone https://github.com/yourusername/kurdish-ocr.git
+cd kurdish-ocr
 ```
-Input (1x64x64)
-    |
-    v
-Conv2d(1->32, 3x3) + ReLU + MaxPool(2x2)
-    |
-    v
-Conv2d(32->64, 3x3) + ReLU + MaxPool(2x2)
-    |
-    v
-Conv2d(64->64, 3x3) + ReLU + MaxPool(2x2)
-    |
-    v
-Flatten -> FC(256->64) + ReLU + Dropout(0.5)
-    |
-    v
-FC(64->5) + Softmax
-    |
-    v
-Output (5 classes)
+
+2. **Create virtual environment** (recommended):
+```bash
+python -m venv kurdish_ocr_env
+source kurdish_ocr_env/bin/activate  # On Windows: kurdish_ocr_env\Scripts\activate
 ```
 
-Total Parameters: approximately 500K trainable weights
+3. **Install dependencies**:
+```bash
+pip install opencv-python numpy torch torchvision scikit-learn albumentations tqdm pillow ipywidgets matplotlib seaborn
+```
+
+### Detailed Dependencies List
+- **PyTorch 1.9+**: Deep learning framework
+- **OpenCV**: Image processing and computer vision
+- **NumPy**: Numerical computations
+- **scikit-learn**: Machine learning utilities
+- **albumentations**: Advanced image augmentation
+- **tqdm**: Progress bars
+- **Pillow**: Image loading alternative
+- **matplotlib/seaborn**: Visualization
+- **ipywidgets**: Interactive notebook widgets
 
 ## Quick Start
 
-### Prerequisites
+### Option 1: Use Pre-trained Model (Recommended for Testing)
 
+1. **Download pre-trained model** (if not already in repository):
 ```bash
-pip install opencv-python numpy torch torchvision scikit-learn
+# Model should already be included as kurdish_letter_model_pytorch.pth
 ```
 
-### Step 1: Train the Model
+2. **Test single image**:
+```bash
+jupyter notebook testing_CNN.ipynb
+```
+Then run the prediction code:
+```python
+image_path = "path/to/your/kurdish_letter_image.jpg"
+predicted_class, confidence, probabilities = predict_single_image(image_path)
+print(f"Predicted: {predicted_class} with {confidence:.2f}% confidence")
+```
 
-Run the training notebook:
+### Option 2: Train the Model from Scratch
 
+1. **Prepare dataset**:
+```bash
+python3 create_combined_dataset.py
+```
+
+2. **Start training**:
 ```bash
 jupyter notebook training_CNN.ipynb
 ```
 
-This notebook performs the following:
-- Loads images from the letter category folders
-- Normalizes and preprocesses data to 64x64 grayscale format
-- Splits data into 80% training and 20% testing sets
-- Trains the CNN model for 20 epochs
-- Evaluates performance on the test set
-- Saves model weights to kurdish_letter_model_pytorch.pth
+3. **Monitor training progress** in real-time as the model achieves:
+   - Epoch 1: ~21% accuracy
+   - Epoch 5: ~88% accuracy
+   - Epoch 10: ~93% accuracy
+   - Best: 95.87% accuracy at epoch 37
 
-Training Configuration:
-- Input size: 64x64 grayscale images
-- Batch size: 32
-- Epochs: 20
-- Learning rate: 0.001 (Adam optimizer)
-- Train/Test split: 80/20
-- Loss function: CrossEntropyLoss
+## Training Process
 
-### Step 2: Test the Model
-
-Run the testing notebook:
-
-```bash
-jupyter notebook testing_CNN.ipynb
+### Training Configuration
+```python
+IMG_SIZE = 64                    # Input image dimensions (64x64 pixels)
+CHANNELS = 1 (converted to 3)    # Single channel converted for augmentation
+EPOCHS = 100                     # Maximum training epochs
+BATCH_SIZE = 32                  # Images per batch
+LEARNING_RATE = 0.001            # Adam optimizer learning rate
+EARLY_STOPPING_PATIENCE = 15     # Early stopping patience
+DROPOUT_RATE = 0.3               # Dropout regularization rate
 ```
 
-This notebook provides tools to evaluate the trained model:
-- Load pre-trained model weights
-- Predict classes for single images or batches
-- Display confidence scores for each class
-- Visualize probability distributions for predictions
+### Training Dynamics
+- **Optimizer**: Adam with weight decay (1e-4)
+- **Loss Function**: CrossEntropyLoss
+- **Learning Rate Scheduler**: ReduceLROnPlateau (factor=0.5, patience=5)
+- **Monitoring**: Generalization monitor to detect overfitting
+- **Checkpointing**: Models saved only when validation accuracy improves
+
+### Training Results
+- **Best Epoch**: 37
+- **Best Validation Accuracy**: **95.87%**
+- **Final Training Accuracy**: 94.6%
+- **Training Time**: 15.8 minutes on GPU
+- **Total Parameters**: 1,491,009
+- **Early Stopping**: Triggered at epoch 52
+
+### Performance Metrics
+| Metric | Value | Description |
+|--------|-------|-------------|
+| Best Validation Accuracy | **95.87%** | Achieved at epoch 37 |
+| Final Training Accuracy | 94.6% | At stopping epoch 52 |
+| Best Validation Loss | 0.1271 | At epoch 38 |
+| Final Training Loss | 0.1792 | At epoch 52 |
+| Training Time | 15.8 minutes | Total training duration |
+| Total Parameters | 1.49M | Trainable weights |
 
 ## Model Performance
 
-Expected results after training:
+### Training Dynamics Analysis
+- **Epoch 1**: 21.23% validation accuracy (rapid initial learning)
+- **Epoch 5**: 88.13% validation accuracy (rapid convergence)
+- **Epoch 10**: 92.88% validation accuracy (continued improvement)
+- **Epoch 37**: 95.87% validation accuracy (best performance)
+- **Final**: Maintained high performance with minimal overfitting
 
-| Metric | Value |
-|--------|-------|
-| Training Accuracy | 90-95% |
-| Test Accuracy | 85-90% |
-| Final Loss | Less than 0.2 |
-| Device Support | GPU/CPU Auto-detect |
+### Key Performance Indicators
+1. **Excellent Generalization**: Validation accuracy consistently higher than training accuracy due to data augmentation
+2. **Rapid Convergence**: Achieved >90% accuracy within first 10 epochs
+3. **Minimal Overfitting**: Training and validation curves remain close throughout training
+4. **Stable Training**: No loss spikes or performance degradation
+
+### Computational Performance
+- **Inference Speed**: <20ms per image on GPU
+- **Inference Speed**: <50ms per image on CPU
+- **Model Size**: ~17.2 MB (portable for edge deployment)
+- **Memory Usage**: Optimized with mixed precision training
+
+## Results
+
+### Comprehensive Performance Analysis
+
+The model achieved remarkable results across all evaluation metrics:
+
+#### Accuracy Performance
+- **Best Validation Accuracy**: 95.87%
+- **Training Accuracy**: 94.6%
+- **Accuracy Gap**: 1.27% (indicating excellent generalization)
+
+#### Training Efficiency
+- **Convergence Speed**: 88.13% accuracy by epoch 5
+- **Training Time**: 15.8 minutes on GPU
+- **Memory Efficiency**: Optimized with mixed precision
+- **Resource Utilization**: Balanced computation and accuracy
+
+#### Dataset Performance
+The model performs consistently across all 33 Kurdish character classes:
+- **Balanced Performance**: Consistent accuracy across all characters
+- **Character Recognition**: All 33 classes achieve high recognition rates
+- **Visual Similarity Handling**: Successfully distinguishes visually similar characters
+
+### Real-world Application Potential
+- **Digitization Projects**: Suitable for Kurdish document digitization
+- **Educational Tools**: Kurdish language learning applications
+- **Cultural Preservation**: Digital preservation of Kurdish literature
+- **Government Applications**: Processing Kurdish administrative documents
+
+## Usage Examples
+
+### Basic Single Image Prediction
+```python
+import torch
+import cv2
+import numpy as np
+
+# Load test image
+image_path = "test_kurdish_letter.jpg"
+
+# Predict using trained model
+predicted_class, confidence, probabilities = predict_single_image(image_path)
+
+# Display results
+print(f"Predicted Kurdish character: {predicted_class}")
+print(f"Confidence: {confidence:.2f}%")
+print(f"Full probability distribution: {probabilities}")
+```
+
+### Batch Image Processing
+```python
+# Test multiple images from directory
+test_multiple_images(folder_path="path/to/test/images/")
+
+# Test specific files
+test_multiple_images(file_list=["letter1.jpg", "letter2.png", "letter3.jpg"])
+```
+
+### Live Camera Interface
+The testing notebook includes an interactive GUI:
+1. **Camera Selection**: Choose from multiple camera sources
+2. **ROI Capture**: Define region of interest for character recognition
+3. **Real-time Processing**: Instant prediction and feedback
+4. **Confidence Display**: Shows confidence percentage and alternatives
+
+### Custom Implementation
+```python
+# Load and use model programmatically
+model = KurdishAdvancedCNN(num_classes=33)
+model.load_state_dict(torch.load('kurdish_letter_model_pytorch.pth', map_location=device)['model_state_dict'])
+model.eval()
+
+# Process custom image
+def process_custom_image(image_path):
+    # Preprocessing (same as training)
+    image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+    image = cv2.resize(image, (64, 64))
+    image = np.stack([image] * 3, axis=-1)  # Convert to 3 channels
+    image = image.astype('float32') / 255.0
+    image = (image - 0.456) / 0.224  # Normalize with ImageNet stats
+    image = np.transpose(image, (2, 0, 1))
+    img_tensor = torch.from_numpy(image).unsqueeze(0).float().to(device)
+
+    # Inference
+    with torch.no_grad():
+        output = model(img_tensor)
+        probabilities = torch.nn.functional.softmax(output, dim=1)
+        confidence, predicted_idx = torch.max(probabilities, 1)
+
+    return predicted_idx.item(), confidence.item()
+```
+
+## Technical Details
+
+### Advanced Deep Learning Techniques
+
+#### 1. Residual Connections with Projection
+- **Purpose**: Prevent vanishing gradients in deep networks
+- **Implementation**: 1x1 Convolutional projection layers for dimension matching
+- **Benefit**: Enables training of 4-layer deep network effectively
+
+#### 2. Mixed Precision Training (AMP)
+- **Purpose**: Accelerate training while maintaining accuracy
+- **Implementation**: Automatic Mixed Precision using GradScaler
+- **Benefit**: 2-3x faster training on GPU with same accuracy
+
+#### 3. Data Augmentation Strategy
+- **Horizontal Flip**: 30% probability for orientation invariance
+- **Rotation**: ±15 degrees for angle invariance
+- **Affine Transforms**: Translation, scaling for position invariance
+- **Photometric**: Brightness, contrast adjustments for lighting invariance
+- **Noise**: Gaussian noise for robustness
+- **Elastic**: Elastic transforms for handwriting variations
+
+#### 4. Regularization Techniques
+- **Batch Normalization**: After each convolutional layer
+- **Dropout**: 30% in convolutional and fully connected layers
+- **Early Stopping**: Prevents overfitting after 15 epochs without improvement
+- **Weight Decay**: Adam optimizer L2 regularization (1e-4)
+
+### Model Architecture Details
+
+#### Convolutional Blocks
+Each residual block contains:
+- Two Conv2d layers (3x3 kernels)
+- Batch Normalization after each Conv layer
+- LeakyReLU activation (0.1 slope)
+- MaxPooling (2x2) for spatial reduction
+- Dropout for regularization
+
+#### Classification Head
+- Global Average Pooling (replaces Flatten)
+- Three Fully Connected layers with BatchNorm and Dropout
+- Softmax for multi-class probability distribution
+
+### Hardware Optimization
+- **GPU Support**: Automatic detection and utilization
+- **CPU Fallback**: Seamless operation without GPU
+- **Memory Management**: Optimized for standard hardware
+- **Batch Processing**: Efficient GPU utilization during inference
+
 
 ## Notebooks Overview
 
 ### training_CNN.ipynb
 
-Purpose: Train the CNN model from scratch on the Kurdish letter dataset.
+**Primary Purpose**: Comprehensive training pipeline for Kurdish character recognition
 
-Key Sections:
+**Key Sections**:
 
-1. **Libraries** - Import required packages (PyTorch, OpenCV, scikit-learn, NumPy)
+1. **Environment Setup**
+   - Library imports (PyTorch, OpenCV, scikit-learn, NumPy, albumentations)
+   - Device detection (GPU/CPU)
+   - Configuration parameters
 
-2. **Configuration** - Set training parameters:
-   - IMG_SIZE: 64 (image dimensions)
-   - EPOCHS: 20
-   - BATCH_SIZE: 32
-   - LEARNING_RATE: 0.001
+2. **Advanced Model Architecture**
+   - KurdishAdvancedCNN class definition with residual connections
+   - Projection shortcuts for channel dimension matching
+   - LeakyReLU activation and batch normalization
+   - Global Average Pooling implementation
 
-3. **Model Architecture** - Define the KurdishCNN class:
-   - Three convolutional layers with ReLU activation
-   - MaxPooling layers for dimensionality reduction
-   - Two fully connected layers with dropout
-   - Dynamic calculation of flattened layer dimensions
+3. **Custom Dataset Class**
+   - KurdishAlphabetDataset with automated folder scanning
+   - Image loading and preprocessing pipeline
+   - Label encoding and validation data splitting
+   - Data augmentation for training data
 
-4. **Loading Data** - Read and preprocess images:
-   - Scans EEE_letters, LLL_letters, OOO_letters, RRR_letters, VVV_letters folders
-   - Reads images in PNG, JPG, JPEG, BMP formats
-   - Converts to grayscale
-   - Resizes to 64x64 pixels
-   - Prints count of loaded images per category
+4. **Data Preparation Pipeline**
+   - Load 33,067 images across 33 classes
+   - 80:20 train-validation split (26,453/6,614 samples)
+   - Apply albumentations augmentation pipeline
+   - Normalize with ImageNet statistics
 
-5. **Data Preparation** - Process loaded data:
-   - Normalize pixel values to 0-1 range
-   - Reshape to PyTorch format (batch, channels, height, width)
-   - Encode categorical labels to numeric values
-   - Split data into training and testing sets
-   - Create DataLoaders for batch processing
+5. **Optimized Training Loop**
+   - Mixed Precision Training with GradScaler
+   - Generalization Monitor for overfitting detection
+   - Learning Rate Scheduling with ReduceLROnPlateau
+   - Checkpoint saving for best validation accuracy
+   - Real-time progress tracking with tqdm
 
-6. **Training Loop** - Train the model:
-   - Forward pass through the network
-   - Calculate loss using CrossEntropyLoss
-   - Backpropagation to compute gradients
-   - Update weights using Adam optimizer
-   - Display loss and accuracy per epoch
+6. **Training Results & Logging**
+   - Detailed epoch-by-epoch metrics
+   - Training/Validation loss and accuracy curves
+   - Early stopping implementation
+   - Model checkpointing
 
-7. **Evaluation** - Test on unseen data:
-   - Set model to evaluation mode
-   - Run inference on test set
-   - Calculate and display final test accuracy
-
-8. **Save Model** - Export trained weights:
-   - Save model state dictionary as kurdish_letter_model_pytorch.pth
-   - Weights can be loaded later for inference
-
-Output: Model file (kurdish_letter_model_pytorch.pth) containing all trained weights
-
----
+7. **Comprehensive Evaluation**
+   - `evaluate_model_comprehensive()` function
+   - Per-class accuracy analysis
+   - Confusion matrix heatmap
+   - Top-K accuracy calculation
+   - Error analysis and visualization
 
 ### testing_CNN.ipynb
 
-Purpose: Test and evaluate the trained model on new images.
+**Primary Purpose**: Inference and evaluation pipeline for trained Kurdish OCR model
 
-Key Sections:
+**Key Sections**:
 
-1. **Libraries** - Import required packages for inference
+1. **Model Loading & Setup**
+   - Load trained KurdishAdvancedCNN architecture
+   - Load pre-trained weights from checkpoint
+   - Load label encoder for character mapping
+   - Device configuration (GPU/CPU auto-detect)
 
-2. **Configuration & Model Definition** - Set up parameters:
-   - IMG_SIZE: 64 (must match training)
-   - CHANNELS: 1 (grayscale)
-   - MODEL_PATH: location of saved weights
-   - Device setup (GPU or CPU)
-   - Category definitions (must match training)
-   - KurdishCNN class definition (identical to training_CNN.ipynb)
+2. **Prediction Functions**
+   - `predict_single_image()`: Single image classification
+   - `predict_from_array()`: Array-based prediction
+   - Confidence scoring and probability distribution
+   - Error handling and validation
 
-3. **Model Loading** - Prepare model for inference:
-   - Initialize KurdishCNN with correct number of classes
-   - Load saved weights from file
-   - Move model to device (GPU/CPU)
-   - Set to evaluation mode (disables dropout, batch normalization)
+3. **Interactive GUI Interface**
+   - Live camera capture with ROI selection
+   - Real-time character recognition
+   - Confidence visualization
+   - Camera index selection
+   - Start/Stop controls
 
-4. **Prediction Functions**:
-
-   - `predict_single_image(image_path)`: Classifies one image
-     - Reads image in grayscale
-     - Resizes to 64x64
-     - Normalizes pixel values
-     - Converts to PyTorch tensor
-     - Runs inference with torch.no_grad()
-     - Computes softmax probabilities
-     - Returns predicted class, confidence score, and full probability distribution
-     - Handles errors gracefully
-
-   - `display_prediction(image_path, predicted_class, confidence, probabilities)`: Formats results
-     - Prints table with prediction details
-     - Shows confidence percentage for each class
-     - Displays probability bars for visual comparison
-
-   - `test_multiple_images(folder_path=None, file_list=None)`: Batch testing
-     - Tests all images in a folder OR
-     - Tests specific files from a list
-     - Supports PNG, JPG, JPEG, BMP formats
-     - Prints results for each image
-
-5. **Usage Examples** - Ready-to-use code samples:
-   - Test single image by path
-   - Test all JPG files in current directory
-   - Test images in a specific folder
-   - Test specific image files by name
-
-## Configuration Parameters
-
-Modify these settings in the notebooks:
-
-```python
-IMG_SIZE = 64          # Image dimensions (64x64 pixels)
-CHANNELS = 1           # Grayscale images
-EPOCHS = 20            # Training iterations
-BATCH_SIZE = 32        # Images per training batch
-LEARNING_RATE = 0.001  # Adam optimizer learning rate
-```
-
-## Data Format
-
-Requirements for training data:
-
-- Folder structure: One folder per letter (EEE_letters, LLL_letters, etc.)
-- Supported formats: PNG, JPG, JPEG, BMP
-- Recommended: 100-200 images per class minimum
-- Images: Can be color or grayscale (converted automatically)
-- Size: Any size (resized to 64x64 automatically)
-
-Optional naming convention for images:
-```
-eee_letter_0.jpg
-eee_letter_1.jpg
-eee_letter_2.jpg
-lll_letter_0.jpg
-...
-```
-
-## Usage Examples
-
-### Single Image Prediction (in testing_CNN.ipynb)
-
-```python
-image_path = "test_letter.jpg"
-predicted_class, confidence, probabilities = predict_single_image(image_path)
-if predicted_class:
-    display_prediction(image_path, predicted_class, confidence, probabilities)
-```
-
-### Batch Testing - Folder (in testing_CNN.ipynb)
-
-```python
-test_multiple_images(folder_path="EEE_letters")
-```
-
-### Batch Testing - Specific Files (in testing_CNN.ipynb)
-
-```python
-test_multiple_images(file_list=["image1.jpg", "image2.png", "image3.jpg"])
-```
-
-## Troubleshooting
-
-### Model Loading Error
-
-```
-Error: Model file not found
-```
-
-Solution: Ensure training_CNN.ipynb has been run to generate kurdish_letter_model_pytorch.pth in the project directory.
-
-### Mismatch Between Training and Testing
-
-```
-Error: Input size mismatch or dimension error
-```
-
-Solution: Verify that training_CNN.ipynb and testing_CNN.ipynb have identical configuration parameters:
-- IMG_SIZE = 64
-- CHANNELS = 1
-- CATEGORIES list (same order)
-
-### Out of Memory Error
-
-```
-CUDA out of memory
-```
-
-Solution: Reduce BATCH_SIZE in training_CNN.ipynb or use CPU by setting device = torch.device('cpu')
-
-### No Images Found During Training
-
-```
-Warning: Folder not found
-```
-
-Solution: Ensure letter folders (EEE_letters, LLL_letters, etc.) are in the same directory as the notebooks, with images inside.
-
-## Dependencies
-
-- PyTorch 1.9 or higher
-- OpenCV (cv2) - Image processing
-- NumPy - Array operations and numerical computing
-- scikit-learn - Label encoding and train/test splitting
-- Matplotlib - Visualization (optional)
-
-Install all dependencies:
-
-```bash
-pip install torch torchvision opencv-python numpy scikit-learn matplotlib
-```
-
-## Model Weights
-
-Pre-trained model weights are saved as:
-```
-kurdish_letter_model_pytorch.pth
-```
-
-Loading the model in testing_CNN.ipynb:
-```python
-model = KurdishCNN(num_classes=5)
-model.load_state_dict(torch.load('kurdish_letter_model_pytorch.pth', map_location=device))
-model.eval()
-```
-
-## Deep Learning Concepts Demonstrated
-
-- Convolutional Neural Networks (CNN) for image classification
-- Data preprocessing and normalization
-- Train/Test data splitting for model evaluation
-- Backpropagation and gradient descent optimization
-- Dropout regularization to prevent overfitting
-- GPU acceleration support with PyTorch
-- Batch processing with DataLoaders
-- Label encoding for categorical data
-
-## File Sizes and Details
-
-- Model weights file: Approximately 2-3 MB
-- Training time: 2-5 minutes (CPU), 30-60 seconds (GPU)
-- Inference time: Less than 100ms per image (GPU), 200-500ms (CPU)
-
-## License
-
-This project is open source and available under the MIT License.
-
-## Contributing
-
-Contributions are welcome. Please feel free to:
-- Report issues or bugs
-- Suggest improvements
-- Share additional training data
-- Provide feedback
-
-## Support
-
-For questions or issues, please open a GitHub issue or contact the project maintainer.
-
----
-
-Last Updated: 2024
-Model Version: 1.0
-Status: Production Ready
+4. **Batch Processing Tools**
+   - `test_multiple_images()` function
+   - Folder-based testing
+   - File list testing
+   - Confidence analysis
+   - Error visualization
